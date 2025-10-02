@@ -261,16 +261,17 @@ customElements.define("anchor-web-component", AnchorDemo);
           <template shadowrootmode="open">
             <link rel="stylesheet" href="/demo.css" />
             <link rel="stylesheet" href="/anchor-shadow-parent.css" />
-            <div style="position: relative">
-              <div id="shadow-anchor-positioning" class="anchor">Anchor</div>
+            <div style="position: relative;">
+              <child-component data-polyfillable>
+                <template shadowrootmode="open">
+                  <link rel="stylesheet" href="/demo.css" />
+                  <link rel="stylesheet" href="/anchor-shadow-child.css" />
+                  <div id="child-target-positioning" class="target">Target</div>
+                </template>
+              </child-component>
+
+            <div id="parent-anchor-positioning" class="anchor">Anchor</div>
             </div>
-            <child-component data-polyfillable>
-              <template shadowrootmode="open">
-                <link rel="stylesheet" href="/demo.css" />
-                <link rel="stylesheet" href="/anchor-shadow-child.css" />
-                <div id="shadow-target-positioning" class="target">Target</div>
-              </template>
-            </child-component>
           </template>
         </parent-component>
       </div>

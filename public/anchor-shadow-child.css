@@ -1,5 +1,5 @@
 #child-target-positioning {
   position: absolute;
-  right: anchor(--shadow-anchor-positioning right, 50px);
+  right: anchor(--shadow-anchor-positioning right);
   top: anchor(--shadow-anchor-positioning bottom);
 }
