@@ -37,13 +37,14 @@
 
       if (!SUPPORTS_ANCHOR_POSITIONING) {
         btn.addEventListener('click', () => {
-          document
-            .querySelector('anchor-web-component')
-            .applyPolyfill()
-            .then(() => {
-              btn.innerText = 'Polyfill Applied';
-              btn.setAttribute('disabled', '');
-            });
+          Promise.all(
+            [...document.querySelectorAll('[data-polyfillable]')].map((e) =>
+              e.applyPolyfill(),
+            ),
+          ).then(() => {
+            btn.innerText = 'Polyfill Applied';
+            btn.setAttribute('disabled', '');
+          });
         });
       } else {
         btn.innerText = 'No Polyfill Needed';
@@ -53,13 +54,28 @@
         );
       }
 
-      class AnchorWebComponent extends HTMLElement {
+      class BaseWebComponent extends HTMLElement {
         /* This would typically be run in connectedCallback() */
         applyPolyfill() {
           return polyfill({ root: [this.shadowRoot] });
         }
       }
+
+      class AnchorWebComponent extends BaseWebComponent {}
       customElements.define('anchor-web-component', AnchorWebComponent);
+
+      class ParentComponent extends BaseWebComponent {}
+      customElements.define('parent-component', ParentComponent);
+
+      class ChildComponent extends BaseWebComponent {
+        connectedCallback() {
+          console.log({
+            shadowRoot: this.shadowRoot,
+            host: this.shadowRoot.host.parentNode.host.parentNode.parentNode,
+          });
+        }
+      }
+      customElements.define('child-component', ChildComponent);
     </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script src="https://unpkg.com/prismjs@v1.x/components/prism-core.min.js"></script>
@@ -182,7 +198,7 @@
         Works if anchor and target are both inside the same shadow root
       </h2>
       <div class="demo-elements">
-        <anchor-web-component>
+        <anchor-web-component data-polyfillable>
           <template shadowrootmode="open">
             <link rel="stylesheet" href="/demo.css" />
             <link rel="stylesheet" href="/anchor-shadow-root.css" />
@@ -234,6 +250,30 @@ class AnchorDemo extends HTMLElement {
 customElements.define("anchor-web-component", AnchorDemo);
 &lt;/script&gt;
 </code></pre>
+    </section>
+    <section id="nested-shadow-roots" class="demo-item">
+      <h2>
+        <a href="#nested-shadow-roots" aria-hidden="true">🔗</a>
+        Child shadow root can anchor to parent shadow root
+      </h2>
+      <div class="demo-elements">
+        <parent-component data-polyfillable>
+          <template shadowrootmode="open">
+            <link rel="stylesheet" href="/demo.css" />
+            <link rel="stylesheet" href="/anchor-shadow-parent.css" />
+            <div style="position: relative">
+              <div id="shadow-anchor-positioning" class="anchor">Anchor</div>
+            </div>
+            <child-component data-polyfillable>
+              <template shadowrootmode="open">
+                <link rel="stylesheet" href="/demo.css" />
+                <link rel="stylesheet" href="/anchor-shadow-child.css" />
+                <div id="shadow-target-positioning" class="target">Target</div>
+              </template>
+            </child-component>
+          </template>
+        </parent-component>
+      </div>
     </section>
     <section id="sponsor">
       <h2>Sponsor OddBird’s OSS Work</h2>
